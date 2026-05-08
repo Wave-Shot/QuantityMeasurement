@@ -23,7 +23,8 @@ public class Quantity<U extends IMeasurable> {
             return a / b;
         });
 
-        private final DoubleBinaryOperator operator;
+        private final DoubleBinaryOperator
+                operator;
 
         ArithmeticOperation(
                 DoubleBinaryOperator operator
@@ -37,7 +38,8 @@ public class Quantity<U extends IMeasurable> {
                 double b
         ) {
 
-            return operator.applyAsDouble(a, b);
+            return operator
+                    .applyAsDouble(a, b);
         }
     }
 
@@ -74,7 +76,8 @@ public class Quantity<U extends IMeasurable> {
     private void validateArithmeticOperands(
             Quantity<U> other,
             U targetUnit,
-            boolean targetUnitRequired
+            boolean targetUnitRequired,
+            String operation
     ) {
 
         if (other == null) {
@@ -102,6 +105,11 @@ public class Quantity<U extends IMeasurable> {
                     "Target unit cannot be null"
             );
         }
+
+        this.unit
+                .validateOperationSupport(
+                        operation
+                );
     }
 
     private double performBaseArithmetic(
@@ -123,7 +131,9 @@ public class Quantity<U extends IMeasurable> {
 
     private double convertToBaseUnit() {
 
-        return unit.convertToBaseUnit(value);
+        return unit.convertToBaseUnit(
+                value
+        );
     }
 
     private double roundToTwoDecimals(
@@ -177,7 +187,8 @@ public class Quantity<U extends IMeasurable> {
         validateArithmeticOperands(
                 other,
                 targetUnit,
-                true
+                true,
+                "addition"
         );
 
         double resultBase =
@@ -186,14 +197,15 @@ public class Quantity<U extends IMeasurable> {
                         ArithmeticOperation.ADD
                 );
 
-        double convertedResult =
-                targetUnit.convertFromBaseUnit(
-                        resultBase
-                );
+        double converted =
+                targetUnit
+                        .convertFromBaseUnit(
+                                resultBase
+                        );
 
         return new Quantity<>(
                 roundToTwoDecimals(
-                        convertedResult
+                        converted
                 ),
                 targetUnit
         );
@@ -214,7 +226,8 @@ public class Quantity<U extends IMeasurable> {
         validateArithmeticOperands(
                 other,
                 targetUnit,
-                true
+                true,
+                "subtraction"
         );
 
         double resultBase =
@@ -223,14 +236,15 @@ public class Quantity<U extends IMeasurable> {
                         ArithmeticOperation.SUBTRACT
                 );
 
-        double convertedResult =
-                targetUnit.convertFromBaseUnit(
-                        resultBase
-                );
+        double converted =
+                targetUnit
+                        .convertFromBaseUnit(
+                                resultBase
+                        );
 
         return new Quantity<>(
                 roundToTwoDecimals(
-                        convertedResult
+                        converted
                 ),
                 targetUnit
         );
@@ -243,7 +257,8 @@ public class Quantity<U extends IMeasurable> {
         validateArithmeticOperands(
                 other,
                 null,
-                false
+                false,
+                "division"
         );
 
         return performBaseArithmetic(
@@ -253,10 +268,12 @@ public class Quantity<U extends IMeasurable> {
     }
 
     public double getValue() {
+
         return value;
     }
 
     public U getUnit() {
+
         return unit;
     }
 
@@ -302,7 +319,7 @@ public class Quantity<U extends IMeasurable> {
         return "Quantity(" +
                 value +
                 ", " +
-                unit.getUnitName() +
-                ")";
+                unit.getUnitName()
+                + ")";
     }
 }
