@@ -23,7 +23,10 @@ public class QuantityMeasurementApp {
         private final double value;
         private final LengthUnit unit;
 
-        public QuantityLength(double value, LengthUnit unit) {
+        public QuantityLength(
+                double value,
+                LengthUnit unit
+        ) {
 
             validateValue(value);
 
@@ -37,7 +40,9 @@ public class QuantityMeasurementApp {
             this.unit = unit;
         }
 
-        private static void validateValue(double value) {
+        private static void validateValue(
+                double value
+        ) {
 
             if (!Double.isFinite(value)) {
                 throw new IllegalArgumentException(
@@ -47,7 +52,9 @@ public class QuantityMeasurementApp {
         }
 
         private double convertToBaseUnit() {
-            return value * unit.getConversionFactor();
+
+            return value *
+                    unit.getConversionFactor();
         }
 
         public QuantityLength convertTo(
@@ -73,52 +80,11 @@ public class QuantityMeasurementApp {
             );
         }
 
-        public QuantityLength add(
-                QuantityLength other
-        ) {
-
-            if (other == null) {
-                throw new IllegalArgumentException(
-                        "Second operand cannot be null"
-                );
-            }
-
-            double thisBase =
-                    this.convertToBaseUnit();
-
-            double otherBase =
-                    other.convertToBaseUnit();
-
-            double totalBase =
-                    thisBase + otherBase;
-
-            double result =
-                    totalBase /
-                            this.unit.getConversionFactor();
-
-            return new QuantityLength(
-                    result,
-                    this.unit
-            );
-        }
-
-        public static QuantityLength add(
+        private static QuantityLength performAddition(
                 QuantityLength first,
                 QuantityLength second,
                 LengthUnit targetUnit
         ) {
-
-            if (first == null || second == null) {
-                throw new IllegalArgumentException(
-                        "Operands cannot be null"
-                );
-            }
-
-            if (targetUnit == null) {
-                throw new IllegalArgumentException(
-                        "Target unit cannot be null"
-                );
-            }
 
             double firstBase =
                     first.convertToBaseUnit();
@@ -135,6 +101,74 @@ public class QuantityMeasurementApp {
 
             return new QuantityLength(
                     result,
+                    targetUnit
+            );
+        }
+
+        public QuantityLength add(
+                QuantityLength other
+        ) {
+
+            if (other == null) {
+                throw new IllegalArgumentException(
+                        "Second operand cannot be null"
+                );
+            }
+
+            return performAddition(
+                    this,
+                    other,
+                    this.unit
+            );
+        }
+
+        public QuantityLength add(
+                QuantityLength other,
+                LengthUnit targetUnit
+        ) {
+
+            if (other == null) {
+                throw new IllegalArgumentException(
+                        "Second operand cannot be null"
+                );
+            }
+
+            if (targetUnit == null) {
+                throw new IllegalArgumentException(
+                        "Target unit cannot be null"
+                );
+            }
+
+            return performAddition(
+                    this,
+                    other,
+                    targetUnit
+            );
+        }
+
+        public static QuantityLength add(
+                QuantityLength first,
+                QuantityLength second,
+                LengthUnit targetUnit
+        ) {
+
+            if (first == null ||
+                    second == null) {
+
+                throw new IllegalArgumentException(
+                        "Operands cannot be null"
+                );
+            }
+
+            if (targetUnit == null) {
+                throw new IllegalArgumentException(
+                        "Target unit cannot be null"
+                );
+            }
+
+            return performAddition(
+                    first,
+                    second,
                     targetUnit
             );
         }
@@ -181,15 +215,9 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        QuantityLength feet1 =
+        QuantityLength feet =
                 new QuantityLength(
                         1.0,
-                        LengthUnit.FEET
-                );
-
-        QuantityLength feet2 =
-                new QuantityLength(
-                        2.0,
                         LengthUnit.FEET
                 );
 
@@ -199,45 +227,50 @@ public class QuantityMeasurementApp {
                         LengthUnit.INCHES
                 );
 
-        QuantityLength yard =
-                new QuantityLength(
-                        1.0,
-                        LengthUnit.YARDS
-                );
-
-        QuantityLength cm =
-                new QuantityLength(
-                        2.54,
-                        LengthUnit.CENTIMETERS
-                );
-
         System.out.println(
-                feet1.add(feet2)
-        );
-
-        System.out.println(
-                feet1.add(inches)
-        );
-
-        System.out.println(
-                inches.add(feet1)
-        );
-
-        System.out.println(
-                yard.add(
-                        new QuantityLength(
-                                3.0,
-                                LengthUnit.FEET
-                        )
+                feet.add(
+                        inches,
+                        LengthUnit.FEET
                 )
         );
 
         System.out.println(
-                cm.add(
+                feet.add(
+                        inches,
+                        LengthUnit.INCHES
+                )
+        );
+
+        System.out.println(
+                feet.add(
+                        inches,
+                        LengthUnit.YARDS
+                )
+        );
+
+        System.out.println(
+                new QuantityLength(
+                        1.0,
+                        LengthUnit.YARDS
+                ).add(
+                        new QuantityLength(
+                                3.0,
+                                LengthUnit.FEET
+                        ),
+                        LengthUnit.YARDS
+                )
+        );
+
+        System.out.println(
+                new QuantityLength(
+                        36.0,
+                        LengthUnit.INCHES
+                ).add(
                         new QuantityLength(
                                 1.0,
-                                LengthUnit.INCHES
-                        )
+                                LengthUnit.YARDS
+                        ),
+                        LengthUnit.FEET
                 )
         );
     }
