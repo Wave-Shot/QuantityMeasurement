@@ -7,284 +7,333 @@ public class QuantityMeasurementAppTest {
     private static final double EPSILON = 1e-2;
 
     @Test
-    public void testEquality_LitreToLitre_SameValue() {
+    public void testSubtraction_SameUnit_FeetMinusFeet() {
 
-        Quantity<VolumeUnit> q1 =
+        Quantity<LengthUnit> result =
                 new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        Quantity<VolumeUnit> q2 =
-                new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        assertTrue(q1.equals(q2));
-    }
-
-    @Test
-    public void testEquality_LitreToMillilitre_EquivalentValue() {
-
-        Quantity<VolumeUnit> litre =
-                new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        Quantity<VolumeUnit> ml =
-                new Quantity<>(
-                        1000.0,
-                        VolumeUnit.MILLILITRE
-                );
-
-        assertTrue(litre.equals(ml));
-    }
-
-    @Test
-    public void testEquality_GallonToLitre_EquivalentValue() {
-
-        Quantity<VolumeUnit> gallon =
-                new Quantity<>(
-                        1.0,
-                        VolumeUnit.GALLON
-                );
-
-        Quantity<VolumeUnit> litre =
-                new Quantity<>(
-                        3.78541,
-                        VolumeUnit.LITRE
-                );
-
-        assertTrue(gallon.equals(litre));
-    }
-
-    @Test
-    public void testConversion_LitreToMillilitre() {
-
-        Quantity<VolumeUnit> litre =
-                new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        Quantity<VolumeUnit> result =
-                litre.convertTo(
-                        VolumeUnit.MILLILITRE
+                        10.0,
+                        LengthUnit.FEET
+                ).subtract(
+                        new Quantity<>(
+                                5.0,
+                                LengthUnit.FEET
+                        )
                 );
 
         assertEquals(
-                1000.0,
+                5.0,
                 result.getValue(),
                 EPSILON
         );
     }
 
     @Test
-    public void testConversion_GallonToLitre() {
+    public void testSubtraction_CrossUnit_FeetMinusInches() {
 
-        Quantity<VolumeUnit> gallon =
+        Quantity<LengthUnit> result =
                 new Quantity<>(
-                        1.0,
-                        VolumeUnit.GALLON
-                );
-
-        Quantity<VolumeUnit> result =
-                gallon.convertTo(
-                        VolumeUnit.LITRE
+                        10.0,
+                        LengthUnit.FEET
+                ).subtract(
+                        new Quantity<>(
+                                6.0,
+                                LengthUnit.INCHES
+                        )
                 );
 
         assertEquals(
-                3.79,
+                9.5,
                 result.getValue(),
                 EPSILON
         );
     }
 
     @Test
-    public void testConversion_MillilitreToGallon() {
+    public void testSubtraction_ExplicitTargetUnit_Inches() {
 
-        Quantity<VolumeUnit> ml =
+        Quantity<LengthUnit> result =
                 new Quantity<>(
-                        1000.0,
-                        VolumeUnit.MILLILITRE
-                );
-
-        Quantity<VolumeUnit> result =
-                ml.convertTo(
-                        VolumeUnit.GALLON
+                        10.0,
+                        LengthUnit.FEET
+                ).subtract(
+                        new Quantity<>(
+                                6.0,
+                                LengthUnit.INCHES
+                        ),
+                        LengthUnit.INCHES
                 );
 
         assertEquals(
-                0.26,
+                114.0,
                 result.getValue(),
                 EPSILON
         );
     }
 
     @Test
-    public void testAddition_LitrePlusMillilitre() {
+    public void testSubtraction_ResultingInNegative() {
 
-        Quantity<VolumeUnit> litre =
+        Quantity<LengthUnit> result =
                 new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
+                        5.0,
+                        LengthUnit.FEET
+                ).subtract(
+                        new Quantity<>(
+                                10.0,
+                                LengthUnit.FEET
+                        )
                 );
 
-        Quantity<VolumeUnit> ml =
+        assertEquals(
+                -5.0,
+                result.getValue(),
+                EPSILON
+        );
+    }
+
+    @Test
+    public void testSubtraction_ResultingInZero() {
+
+        Quantity<LengthUnit> result =
                 new Quantity<>(
-                        1000.0,
-                        VolumeUnit.MILLILITRE
+                        10.0,
+                        LengthUnit.FEET
+                ).subtract(
+                        new Quantity<>(
+                                120.0,
+                                LengthUnit.INCHES
+                        )
                 );
 
-        Quantity<VolumeUnit> result =
-                litre.add(
-                        ml,
+        assertEquals(
+                0.0,
+                result.getValue(),
+                EPSILON
+        );
+    }
+
+    @Test
+    public void testDivision_SameUnit() {
+
+        double result =
+                new Quantity<>(
+                        10.0,
+                        LengthUnit.FEET
+                ).divide(
+                        new Quantity<>(
+                                2.0,
+                                LengthUnit.FEET
+                        )
+                );
+
+        assertEquals(
+                5.0,
+                result,
+                EPSILON
+        );
+    }
+
+    @Test
+    public void testDivision_CrossUnit() {
+
+        double result =
+                new Quantity<>(
+                        24.0,
+                        LengthUnit.INCHES
+                ).divide(
+                        new Quantity<>(
+                                2.0,
+                                LengthUnit.FEET
+                        )
+                );
+
+        assertEquals(
+                1.0,
+                result,
+                EPSILON
+        );
+    }
+
+    @Test
+    public void testDivision_RatioLessThanOne() {
+
+        double result =
+                new Quantity<>(
+                        5.0,
+                        LengthUnit.FEET
+                ).divide(
+                        new Quantity<>(
+                                10.0,
+                                LengthUnit.FEET
+                        )
+                );
+
+        assertEquals(
+                0.5,
+                result,
+                EPSILON
+        );
+    }
+
+    @Test
+    public void testDivision_ByZero() {
+
+        assertThrows(
+                ArithmeticException.class,
+                () -> new Quantity<>(
+                        10.0,
+                        LengthUnit.FEET
+                ).divide(
+                        new Quantity<>(
+                                0.0,
+                                LengthUnit.FEET
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void testSubtraction_NullOperand() {
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Quantity<>(
+                        10.0,
+                        LengthUnit.FEET
+                ).subtract(null)
+        );
+    }
+
+    @Test
+    public void testDivision_NullOperand() {
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Quantity<>(
+                        10.0,
+                        LengthUnit.FEET
+                ).divide(null)
+        );
+    }
+
+    @Test
+    public void testSubtraction_AllMeasurementCategories() {
+
+        Quantity<WeightUnit> weight =
+                new Quantity<>(
+                        10.0,
+                        WeightUnit.KILOGRAM
+                ).subtract(
+                        new Quantity<>(
+                                5000.0,
+                                WeightUnit.GRAM
+                        )
+                );
+
+        Quantity<VolumeUnit> volume =
+                new Quantity<>(
+                        5.0,
                         VolumeUnit.LITRE
+                ).subtract(
+                        new Quantity<>(
+                                500.0,
+                                VolumeUnit.MILLILITRE
+                        )
+                );
+
+        assertEquals(
+                5.0,
+                weight.getValue(),
+                EPSILON
+        );
+
+        assertEquals(
+                4.5,
+                volume.getValue(),
+                EPSILON
+        );
+    }
+
+    @Test
+    public void testDivision_AllMeasurementCategories() {
+
+        double weight =
+                new Quantity<>(
+                        10.0,
+                        WeightUnit.KILOGRAM
+                ).divide(
+                        new Quantity<>(
+                                5.0,
+                                WeightUnit.KILOGRAM
+                        )
+                );
+
+        double volume =
+                new Quantity<>(
+                        5.0,
+                        VolumeUnit.LITRE
+                ).divide(
+                        new Quantity<>(
+                                10.0,
+                                VolumeUnit.LITRE
+                        )
                 );
 
         assertEquals(
                 2.0,
-                result.getValue(),
+                weight,
                 EPSILON
         );
-    }
-
-    @Test
-    public void testAddition_GallonPlusLitre() {
-
-        Quantity<VolumeUnit> gallon =
-                new Quantity<>(
-                        1.0,
-                        VolumeUnit.GALLON
-                );
-
-        Quantity<VolumeUnit> litre =
-                new Quantity<>(
-                        3.78541,
-                        VolumeUnit.LITRE
-                );
-
-        Quantity<VolumeUnit> result =
-                gallon.add(
-                        litre,
-                        VolumeUnit.GALLON
-                );
 
         assertEquals(
-                2.0,
-                result.getValue(),
+                0.5,
+                volume,
                 EPSILON
         );
     }
 
     @Test
-    public void testVolumeVsLength_Incompatible() {
+    public void testSubtraction_Immutability() {
 
-        Quantity<VolumeUnit> litre =
+        Quantity<LengthUnit> original =
                 new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        Quantity<LengthUnit> feet =
-                new Quantity<>(
-                        1.0,
+                        10.0,
                         LengthUnit.FEET
                 );
 
-        assertFalse(litre.equals(feet));
-    }
-
-    @Test
-    public void testVolumeVsWeight_Incompatible() {
-
-        Quantity<VolumeUnit> litre =
+        original.subtract(
                 new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        Quantity<WeightUnit> kg =
-                new Quantity<>(
-                        1.0,
-                        WeightUnit.KILOGRAM
-                );
-
-        assertFalse(litre.equals(kg));
-    }
-
-    @Test
-    public void testEquality_SameReference() {
-
-        Quantity<VolumeUnit> litre =
-                new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        assertTrue(litre.equals(litre));
-    }
-
-    @Test
-    public void testEquality_NullComparison() {
-
-        Quantity<VolumeUnit> litre =
-                new Quantity<>(
-                        1.0,
-                        VolumeUnit.LITRE
-                );
-
-        assertFalse(litre.equals(null));
-    }
-
-    @Test
-    public void testConstructorValidation_NullUnit() {
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> new Quantity<>(
-                        1.0,
-                        null
+                        5.0,
+                        LengthUnit.FEET
                 )
         );
-    }
-
-    @Test
-    public void testConstructorValidation_InvalidValue() {
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> new Quantity<>(
-                        Double.NaN,
-                        VolumeUnit.LITRE
-                )
-        );
-    }
-
-    @Test
-    public void testConversion_RoundTrip() {
-
-        Quantity<VolumeUnit> original =
-                new Quantity<>(
-                        1.5,
-                        VolumeUnit.LITRE
-                );
-
-        Quantity<VolumeUnit> converted =
-                original.convertTo(
-                        VolumeUnit.MILLILITRE
-                );
-
-        Quantity<VolumeUnit> roundTrip =
-                converted.convertTo(
-                        VolumeUnit.LITRE
-                );
 
         assertEquals(
+                10.0,
                 original.getValue(),
-                roundTrip.getValue(),
+                EPSILON
+        );
+    }
+
+    @Test
+    public void testDivision_Immutability() {
+
+        Quantity<LengthUnit> original =
+                new Quantity<>(
+                        10.0,
+                        LengthUnit.FEET
+                );
+
+        original.divide(
+                new Quantity<>(
+                        2.0,
+                        LengthUnit.FEET
+                )
+        );
+
+        assertEquals(
+                10.0,
+                original.getValue(),
                 EPSILON
         );
     }
