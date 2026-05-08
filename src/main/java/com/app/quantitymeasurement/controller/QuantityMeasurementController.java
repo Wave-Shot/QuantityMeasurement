@@ -1,16 +1,18 @@
 package com.app.quantitymeasurement.controller;
 
-import com.app.quantitymeasurement.dto.QuantityDTO;
 import com.app.quantitymeasurement.service.IQuantityMeasurementService;
-public class
-QuantityMeasurementController {
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/quantity")
+public class QuantityMeasurementController {
 
     private final
     IQuantityMeasurementService
             service;
 
-    public
-    QuantityMeasurementController(
+    public QuantityMeasurementController(
             IQuantityMeasurementService
                     service
     ) {
@@ -18,69 +20,25 @@ QuantityMeasurementController {
         this.service = service;
     }
 
-    public void performComparison(
-            QuantityDTO q1,
-            QuantityDTO q2
+    @GetMapping("/compare")
+
+    public String compare(
+            @RequestParam double value1,
+            @RequestParam String unit1,
+            @RequestParam String type1,
+
+            @RequestParam double value2,
+            @RequestParam String unit2,
+            @RequestParam String type2
     ) {
 
-        System.out.println(
-                service.compare(q1, q2)
-        );
-    }
-
-    public void performConversion(
-            QuantityDTO source,
-            String target
-    ) {
-
-        System.out.println(
-                service.convert(
-                        source,
-                        target
-                )
-        );
-    }
-
-    public void performAddition(
-            QuantityDTO q1,
-            QuantityDTO q2,
-            String target
-    ) {
-
-        System.out.println(
-                service.add(
-                        q1,
-                        q2,
-                        target
-                )
-        );
-    }
-
-    public void performSubtraction(
-            QuantityDTO q1,
-            QuantityDTO q2,
-            String target
-    ) {
-
-        System.out.println(
-                service.subtract(
-                        q1,
-                        q2,
-                        target
-                )
-        );
-    }
-
-    public void performDivision(
-            QuantityDTO q1,
-            QuantityDTO q2
-    ) {
-
-        System.out.println(
-                service.divide(
-                        q1,
-                        q2
-                )
+        return service.compare(
+                value1,
+                unit1,
+                type1,
+                value2,
+                unit2,
+                type2
         );
     }
 }

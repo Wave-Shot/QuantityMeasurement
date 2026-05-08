@@ -1,33 +1,31 @@
 package com.app.quantitymeasurement.service;
 
-import com.app.quantitymeasurement.dto.QuantityDTO;
-import com.app.quantitymeasurement.entity.QuantityMeasurementEntity;
-import com.app.quantitymeasurement.exception.QuantityMeasurementException;
+import com.app.quantitymeasurement.model.QuantityMeasurementEntity;
 import com.app.quantitymeasurement.quantity.Quantity;
-import com.app.quantitymeasurement.repository.IQuantityMeasurementRepository;
+import com.app.quantitymeasurement.repository.QuantityMeasurementRepository;
 import com.app.quantitymeasurement.unit.IMeasurable;
 import com.app.quantitymeasurement.unit.LengthUnit;
 import com.app.quantitymeasurement.unit.TemperatureUnit;
 import com.app.quantitymeasurement.unit.VolumeUnit;
 import com.app.quantitymeasurement.unit.WeightUnit;
 
-public class
-QuantityMeasurementServiceImpl
-        implements
-        IQuantityMeasurementService {
+import org.springframework.stereotype.Service;
+
+@Service
+public class QuantityMeasurementServiceImpl
+        implements IQuantityMeasurementService {
 
     private final
-    IQuantityMeasurementRepository
+    QuantityMeasurementRepository
             repository;
 
     public
     QuantityMeasurementServiceImpl(
-            IQuantityMeasurementRepository
+            QuantityMeasurementRepository
                     repository
     ) {
 
-        this.repository =
-                repository;
+        this.repository = repository;
     }
 
     private IMeasurable parseUnit(
@@ -50,260 +48,49 @@ QuantityMeasurementServiceImpl
                     TemperatureUnit.valueOf(unit);
 
             default ->
-                    throw new
-                            QuantityMeasurementException(
+                    throw new IllegalArgumentException(
                             "Invalid type"
                     );
         };
     }
 
-    private Quantity<?> buildQuantity(
-            QuantityDTO dto
+    @Override
+    public String compare(
+            double value1,
+            String unit1,
+            String type1,
+
+            double value2,
+            String unit2,
+            String type2
     ) {
 
-        IMeasurable measurable =
-                parseUnit(
-                        dto.getMeasurementType(),
-                        dto.getUnit()
+        Quantity<?> q1 =
+                new Quantity<>(
+                        value1,
+                        parseUnit(type1, unit1)
                 );
 
-        return new Quantity<>(
-                dto.getValue(),
-                measurable
+        Quantity<?> q2 =
+                new Quantity<>(
+                        value2,
+                        parseUnit(type2, unit2)
+                );
+
+        boolean result =
+                q1.equals(q2);
+
+        QuantityMeasurementEntity entity =
+                new QuantityMeasurementEntity();
+
+        entity.setOperation("COMPARE");
+        entity.setResult(
+                String.valueOf(result)
         );
-    }
+        entity.setError(false);
 
-    @Override
-    public QuantityMeasurementEntity compare(
-            QuantityDTO q1,
-            QuantityDTO q2
-    ) {
+        repository.save(entity);
 
-        try {
-
-            boolean result =
-                    buildQuantity(q1)
-                            .equals(
-                                    buildQuantity(q2)
-                            );
-
-            QuantityMeasurementEntity
-                    entity =
-                    new
-                            QuantityMeasurementEntity(
-                            "COMPARE",
-                            String.valueOf(
-                                    result
-                            )
-                    );
-
-            repository.save(entity);
-
-            return entity;
-
-        } catch (Exception e) {
-
-            return new
-                    QuantityMeasurementEntity(
-                    "COMPARE",
-                    null,
-                    true,
-                    e.getMessage()
-            );
-        }
-    }
-
-    @Override
-    public QuantityMeasurementEntity convert(
-            QuantityDTO source,
-            String targetUnit
-    ) {
-
-        try {
-
-            Quantity quantity =
-                    buildQuantity(source);
-
-            IMeasurable target =
-                    parseUnit(
-                            source
-                                    .getMeasurementType(),
-                            targetUnit
-                    );
-
-            Quantity result =
-                    quantity.convertTo(
-                            target
-                    );
-
-            QuantityMeasurementEntity
-                    entity =
-                    new
-                            QuantityMeasurementEntity(
-                            "CONVERT",
-                            result.toString()
-                    );
-
-            repository.save(entity);
-
-            return entity;
-
-        } catch (Exception e) {
-
-            return new
-                    QuantityMeasurementEntity(
-                    "CONVERT",
-                    null,
-                    true,
-                    e.getMessage()
-            );
-        }
-    }
-
-    @Override
-    public QuantityMeasurementEntity add(
-            QuantityDTO q1,
-            QuantityDTO q2,
-            String targetUnit
-    ) {
-
-        try {
-
-            Quantity quantity1 =
-                    buildQuantity(q1);
-
-            Quantity quantity2 =
-                    buildQuantity(q2);
-
-            IMeasurable target =
-                    parseUnit(
-                            q1.getMeasurementType(),
-                            targetUnit
-                    );
-
-            Quantity result =
-                    quantity1.add(
-                            quantity2,
-                            target
-                    );
-
-            QuantityMeasurementEntity
-                    entity =
-                    new
-                            QuantityMeasurementEntity(
-                            "ADD",
-                            result.toString()
-                    );
-
-            repository.save(entity);
-
-            return entity;
-
-        } catch (Exception e) {
-
-            return new
-                    QuantityMeasurementEntity(
-                    "ADD",
-                    null,
-                    true,
-                    e.getMessage()
-            );
-        }
-    }
-
-    @Override
-    public QuantityMeasurementEntity subtract(
-            QuantityDTO q1,
-            QuantityDTO q2,
-            String targetUnit
-    ) {
-
-        try {
-
-            Quantity quantity1 =
-                    buildQuantity(q1);
-
-            Quantity quantity2 =
-                    buildQuantity(q2);
-
-            IMeasurable target =
-                    parseUnit(
-                            q1.getMeasurementType(),
-                            targetUnit
-                    );
-
-            Quantity result =
-                    quantity1.subtract(
-                            quantity2,
-                            target
-                    );
-
-            QuantityMeasurementEntity
-                    entity =
-                    new
-                            QuantityMeasurementEntity(
-                            "SUBTRACT",
-                            result.toString()
-                    );
-
-            repository.save(entity);
-
-            return entity;
-
-        } catch (Exception e) {
-
-            return new
-                    QuantityMeasurementEntity(
-                    "SUBTRACT",
-                    null,
-                    true,
-                    e.getMessage()
-            );
-        }
-    }
-
-    @Override
-    public QuantityMeasurementEntity divide(
-            QuantityDTO q1,
-            QuantityDTO q2
-    ) {
-
-        try {
-
-            Quantity quantity1 =
-                    buildQuantity(q1);
-
-            Quantity quantity2 =
-                    buildQuantity(q2);
-
-            double result =
-                    quantity1.divide(
-                            quantity2
-                    );
-
-            QuantityMeasurementEntity
-                    entity =
-                    new
-                            QuantityMeasurementEntity(
-                            "DIVIDE",
-                            String.valueOf(
-                                    result
-                            )
-                    );
-
-            repository.save(entity);
-
-            return entity;
-
-        } catch (Exception e) {
-
-            return new
-                    QuantityMeasurementEntity(
-                    "DIVIDE",
-                    null,
-                    true,
-                    e.getMessage()
-            );
-        }
+        return String.valueOf(result);
     }
 }
