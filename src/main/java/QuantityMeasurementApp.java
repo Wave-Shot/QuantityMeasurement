@@ -92,8 +92,57 @@ public class QuantityMeasurementApp {
                 WeightUnit.KILOGRAM
         );
 
+        Quantity<VolumeUnit> litre =
+                new Quantity<>(
+                        1.0,
+                        VolumeUnit.LITRE
+                );
+
+        Quantity<VolumeUnit> millilitre =
+                new Quantity<>(
+                        1000.0,
+                        VolumeUnit.MILLILITRE
+                );
+
+        Quantity<VolumeUnit> gallon =
+                new Quantity<>(
+                        1.0,
+                        VolumeUnit.GALLON
+                );
+
+        demonstrateEquality(
+                litre,
+                millilitre
+        );
+
+        demonstrateConversion(
+                litre,
+                VolumeUnit.MILLILITRE
+        );
+
+        demonstrateConversion(
+                gallon,
+                VolumeUnit.LITRE
+        );
+
+        demonstrateAddition(
+                litre,
+                millilitre,
+                VolumeUnit.LITRE
+        );
+
+        demonstrateAddition(
+                litre,
+                gallon,
+                VolumeUnit.MILLILITRE
+        );
+
         System.out.println(
-                feet.equals(kg)
+                litre.equals(feet)
+        );
+
+        System.out.println(
+                litre.equals(kg)
         );
     }
 }
