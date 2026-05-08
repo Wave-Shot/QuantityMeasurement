@@ -1,11 +1,38 @@
 public class QuantityMeasurementApp {
 
-    static class Feet {
+    enum LengthUnit {
+
+        FEET(1.0),
+        INCH(1.0 / 12.0);
+
+        private final double conversionFactor;
+
+        LengthUnit(double conversionFactor) {
+            this.conversionFactor = conversionFactor;
+        }
+
+        public double getConversionFactor() {
+            return conversionFactor;
+        }
+    }
+
+    static class QuantityLength {
 
         private final double value;
+        private final LengthUnit unit;
 
-        public Feet(double value) {
+        public QuantityLength(double value, LengthUnit unit) {
+
+            if (unit == null) {
+                throw new IllegalArgumentException("Unit cannot be null");
+            }
+
             this.value = value;
+            this.unit = unit;
+        }
+
+        private double convertToBaseUnit() {
+            return value * unit.getConversionFactor();
         }
 
         @Override
@@ -19,57 +46,36 @@ public class QuantityMeasurementApp {
                 return false;
             }
 
-            Feet feet = (Feet) obj;
+            QuantityLength quantity =
+                    (QuantityLength) obj;
 
-            return Double.compare(feet.value, value) == 0;
+            return Double.compare(
+                    this.convertToBaseUnit(),
+                    quantity.convertToBaseUnit()
+            ) == 0;
         }
-    }
-
-    static class Inches {
-
-        private final double value;
-
-        public Inches(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            if (this == obj) {
-                return true;
-            }
-
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-
-            Inches inches = (Inches) obj;
-
-            return Double.compare(inches.value, value) == 0;
-        }
-    }
-
-    public static boolean compareFeet(double value1, double value2) {
-
-        Feet feet1 = new Feet(value1);
-        Feet feet2 = new Feet(value2);
-
-        return feet1.equals(feet2);
-    }
-
-    public static boolean compareInches(double value1, double value2) {
-
-        Inches inches1 = new Inches(value1);
-        Inches inches2 = new Inches(value2);
-
-        return inches1.equals(inches2);
     }
 
     public static void main(String[] args) {
 
-        System.out.println("Equal (" + compareFeet(1.0, 1.0) + ")");
+        QuantityLength feet =
+                new QuantityLength(1.0, LengthUnit.FEET);
 
-        System.out.println("Equal (" + compareInches(1.0, 1.0) + ")");
+        QuantityLength inches =
+                new QuantityLength(12.0, LengthUnit.INCH);
+
+        QuantityLength inch1 =
+                new QuantityLength(1.0, LengthUnit.INCH);
+
+        QuantityLength inch2 =
+                new QuantityLength(1.0, LengthUnit.INCH);
+
+        System.out.println(
+                "Equal (" + feet.equals(inches) + ")"
+        );
+
+        System.out.println(
+                "Equal (" + inch1.equals(inch2) + ")"
+        );
     }
 }
