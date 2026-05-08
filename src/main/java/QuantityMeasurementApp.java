@@ -2,103 +2,100 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        Quantity<TemperatureUnit> celsius =
-                new Quantity<>(
-                        0.0,
-                        TemperatureUnit.CELSIUS
+        IQuantityMeasurementRepository
+                repository =
+                QuantityMeasurementCacheRepository
+                        .getInstance();
+
+        IQuantityMeasurementService
+                service =
+                new
+                        QuantityMeasurementServiceImpl(
+                        repository
                 );
 
-        Quantity<TemperatureUnit> fahrenheit =
-                new Quantity<>(
-                        32.0,
-                        TemperatureUnit.FAHRENHEIT
+        QuantityMeasurementController
+                controller =
+                new
+                        QuantityMeasurementController(
+                        service
                 );
 
-        Quantity<TemperatureUnit> kelvin =
-                new Quantity<>(
-                        273.15,
-                        TemperatureUnit.KELVIN
-                );
-
-        System.out.println(
-                celsius.equals(fahrenheit)
+        controller.performComparison(
+                new QuantityDTO(
+                        1.0,
+                        "FEET",
+                        "Length"
+                ),
+                new QuantityDTO(
+                        12.0,
+                        "INCHES",
+                        "Length"
+                )
         );
 
-        System.out.println(
-                celsius.equals(kelvin)
-        );
-
-        System.out.println(
-                new Quantity<>(
+        controller.performConversion(
+                new QuantityDTO(
                         100.0,
-                        TemperatureUnit.CELSIUS
-                ).convertTo(
-                        TemperatureUnit.FAHRENHEIT
-                )
+                        "CELSIUS",
+                        "Temperature"
+                ),
+                "FAHRENHEIT"
         );
 
-        System.out.println(
-                new Quantity<>(
-                        32.0,
-                        TemperatureUnit.FAHRENHEIT
-                ).convertTo(
-                        TemperatureUnit.CELSIUS
-                )
+        controller.performAddition(
+                new QuantityDTO(
+                        1.0,
+                        "KILOGRAM",
+                        "Weight"
+                ),
+                new QuantityDTO(
+                        1000.0,
+                        "GRAM",
+                        "Weight"
+                ),
+                "KILOGRAM"
         );
 
-        System.out.println(
-                new Quantity<>(
-                        0.0,
-                        TemperatureUnit.CELSIUS
-                ).convertTo(
-                        TemperatureUnit.KELVIN
-                )
-        );
-
-        try {
-
-            System.out.println(
-                    celsius.add(
-                            new Quantity<>(
-                                    10.0,
-                                    TemperatureUnit.CELSIUS
-                            )
-                    )
-            );
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    e.getMessage()
-            );
-        }
-
-        try {
-
-            System.out.println(
-                    celsius.divide(
-                            new Quantity<>(
-                                    2.0,
-                                    TemperatureUnit.CELSIUS
-                            )
-                    )
-            );
-
-        } catch (Exception e) {
-
-            System.out.println(
-                    e.getMessage()
-            );
-        }
-
-        Quantity<LengthUnit> feet =
-                new Quantity<>(
+        controller.performSubtraction(
+                new QuantityDTO(
                         10.0,
-                        LengthUnit.FEET
-                );
+                        "FEET",
+                        "Length"
+                ),
+                new QuantityDTO(
+                        6.0,
+                        "INCHES",
+                        "Length"
+                ),
+                "FEET"
+        );
 
-        System.out.println(
-                celsius.equals(feet)
+        controller.performDivision(
+                new QuantityDTO(
+                        24.0,
+                        "INCHES",
+                        "Length"
+                ),
+                new QuantityDTO(
+                        2.0,
+                        "FEET",
+                        "Length"
+                )
+        );
+
+        controller.performAddition(
+                new QuantityDTO(
+                        100.0,
+                        "CELSIUS",
+                        "Temperature"
+                ),
+                new QuantityDTO(
+                        50.0,
+                        "CELSIUS",
+                        "Temperature"
+                ),
+                "CELSIUS"
         );
     }
 }
