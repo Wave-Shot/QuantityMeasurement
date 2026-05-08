@@ -50,7 +50,9 @@ public class QuantityMeasurementApp {
             return value * unit.getConversionFactor();
         }
 
-        public QuantityLength convertTo(LengthUnit targetUnit) {
+        public QuantityLength convertTo(
+                LengthUnit targetUnit
+        ) {
 
             if (targetUnit == null) {
                 throw new IllegalArgumentException(
@@ -58,13 +60,81 @@ public class QuantityMeasurementApp {
                 );
             }
 
-            double baseValue = convertToBaseUnit();
+            double baseValue =
+                    convertToBaseUnit();
 
             double convertedValue =
-                    baseValue / targetUnit.getConversionFactor();
+                    baseValue /
+                            targetUnit.getConversionFactor();
 
             return new QuantityLength(
                     convertedValue,
+                    targetUnit
+            );
+        }
+
+        public QuantityLength add(
+                QuantityLength other
+        ) {
+
+            if (other == null) {
+                throw new IllegalArgumentException(
+                        "Second operand cannot be null"
+                );
+            }
+
+            double thisBase =
+                    this.convertToBaseUnit();
+
+            double otherBase =
+                    other.convertToBaseUnit();
+
+            double totalBase =
+                    thisBase + otherBase;
+
+            double result =
+                    totalBase /
+                            this.unit.getConversionFactor();
+
+            return new QuantityLength(
+                    result,
+                    this.unit
+            );
+        }
+
+        public static QuantityLength add(
+                QuantityLength first,
+                QuantityLength second,
+                LengthUnit targetUnit
+        ) {
+
+            if (first == null || second == null) {
+                throw new IllegalArgumentException(
+                        "Operands cannot be null"
+                );
+            }
+
+            if (targetUnit == null) {
+                throw new IllegalArgumentException(
+                        "Target unit cannot be null"
+                );
+            }
+
+            double firstBase =
+                    first.convertToBaseUnit();
+
+            double secondBase =
+                    second.convertToBaseUnit();
+
+            double totalBase =
+                    firstBase + secondBase;
+
+            double result =
+                    totalBase /
+                            targetUnit.getConversionFactor();
+
+            return new QuantityLength(
+                    result,
                     targetUnit
             );
         }
@@ -84,7 +154,8 @@ public class QuantityMeasurementApp {
                 return true;
             }
 
-            if (obj == null || getClass() != obj.getClass()) {
+            if (obj == null ||
+                    getClass() != obj.getClass()) {
                 return false;
             }
 
@@ -108,119 +179,66 @@ public class QuantityMeasurementApp {
         }
     }
 
-    public static double convert(
-            double value,
-            LengthUnit sourceUnit,
-            LengthUnit targetUnit
-    ) {
-
-        QuantityLength quantity =
-                new QuantityLength(
-                        value,
-                        sourceUnit
-                );
-
-        return quantity
-                .convertTo(targetUnit)
-                .getValue();
-    }
-
-    public static void demonstrateLengthConversion(
-            double value,
-            LengthUnit fromUnit,
-            LengthUnit toUnit
-    ) {
-
-        double result =
-                convert(
-                        value,
-                        fromUnit,
-                        toUnit
-                );
-
-        System.out.println(
-                value + " " +
-                        fromUnit +
-                        " = " +
-                        result + " " +
-                        toUnit
-        );
-    }
-
-    public static void demonstrateLengthConversion(
-            QuantityLength quantity,
-            LengthUnit targetUnit
-    ) {
-
-        QuantityLength converted =
-                quantity.convertTo(targetUnit);
-
-        System.out.println(
-                quantity +
-                        " = " +
-                        converted
-        );
-    }
-
-    public static void demonstrateLengthEquality(
-            QuantityLength q1,
-            QuantityLength q2
-    ) {
-
-        System.out.println(
-                "Equal (" +
-                        q1.equals(q2) +
-                        ")"
-        );
-    }
-
-    public static void demonstrateLengthComparison(
-            double value1,
-            LengthUnit unit1,
-            double value2,
-            LengthUnit unit2
-    ) {
-
-        QuantityLength q1 =
-                new QuantityLength(value1, unit1);
-
-        QuantityLength q2 =
-                new QuantityLength(value2, unit2);
-
-        demonstrateLengthEquality(q1, q2);
-    }
-
     public static void main(String[] args) {
 
-        demonstrateLengthConversion(
-                1.0,
-                LengthUnit.FEET,
-                LengthUnit.INCHES
+        QuantityLength feet1 =
+                new QuantityLength(
+                        1.0,
+                        LengthUnit.FEET
+                );
+
+        QuantityLength feet2 =
+                new QuantityLength(
+                        2.0,
+                        LengthUnit.FEET
+                );
+
+        QuantityLength inches =
+                new QuantityLength(
+                        12.0,
+                        LengthUnit.INCHES
+                );
+
+        QuantityLength yard =
+                new QuantityLength(
+                        1.0,
+                        LengthUnit.YARDS
+                );
+
+        QuantityLength cm =
+                new QuantityLength(
+                        2.54,
+                        LengthUnit.CENTIMETERS
+                );
+
+        System.out.println(
+                feet1.add(feet2)
         );
 
-        demonstrateLengthConversion(
-                3.0,
-                LengthUnit.YARDS,
-                LengthUnit.FEET
+        System.out.println(
+                feet1.add(inches)
         );
 
-        demonstrateLengthConversion(
-                36.0,
-                LengthUnit.INCHES,
-                LengthUnit.YARDS
+        System.out.println(
+                inches.add(feet1)
         );
 
-        demonstrateLengthConversion(
-                1.0,
-                LengthUnit.CENTIMETERS,
-                LengthUnit.INCHES
+        System.out.println(
+                yard.add(
+                        new QuantityLength(
+                                3.0,
+                                LengthUnit.FEET
+                        )
+                )
         );
 
-        demonstrateLengthComparison(
-                1.0,
-                LengthUnit.FEET,
-                12.0,
-                LengthUnit.INCHES
+        System.out.println(
+                cm.add(
+                        new QuantityLength(
+                                1.0,
+                                LengthUnit.INCHES
+                        )
+                )
         );
     }
 }
