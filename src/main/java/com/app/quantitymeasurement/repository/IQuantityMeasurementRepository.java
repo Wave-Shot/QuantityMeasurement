@@ -13,4 +13,8 @@ IQuantityMeasurementRepository {
 
     List<QuantityMeasurementEntity>
     getAllMeasurements();
+
+    void deleteAllMeasurements();
+
+    int getTotalCount();
 }

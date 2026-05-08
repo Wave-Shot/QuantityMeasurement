@@ -1,34 +1,48 @@
 package com.app.quantitymeasurement;
 
-import com.app.quantitymeasurement.dto.QuantityDTO;
 import com.app.quantitymeasurement.controller.QuantityMeasurementController;
+import com.app.quantitymeasurement.dto.QuantityDTO;
 import com.app.quantitymeasurement.repository.IQuantityMeasurementRepository;
-import com.app.quantitymeasurement.repository.QuantityMeasurementCacheRepository;
+import com.app.quantitymeasurement.repository.QuantityMeasurementDatabaseRepository;
 import com.app.quantitymeasurement.service.IQuantityMeasurementService;
 import com.app.quantitymeasurement.service.QuantityMeasurementServiceImpl;
+import com.app.quantitymeasurement.util.ApplicationConfig;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.util.logging.Logger;
 
 public class QuantityMeasurementApp {
 
+    private static final Logger logger =
+            Logger.getLogger(
+                    QuantityMeasurementApp.class.getName()
+            );
+
     public static void main(String[] args) {
+
+        initializeDatabase();
 
         IQuantityMeasurementRepository
                 repository =
-                QuantityMeasurementCacheRepository
-                        .getInstance();
+                new QuantityMeasurementDatabaseRepository();
 
         IQuantityMeasurementService
                 service =
-                new
-                        QuantityMeasurementServiceImpl(
+                new QuantityMeasurementServiceImpl(
                         repository
                 );
 
         QuantityMeasurementController
                 controller =
-                new
-                        QuantityMeasurementController(
+                new QuantityMeasurementController(
                         service
                 );
+
+        logger.info(
+                "Application initialized successfully"
+        );
 
         controller.performComparison(
                 new QuantityDTO(
@@ -106,5 +120,57 @@ public class QuantityMeasurementApp {
                 ),
                 "CELSIUS"
         );
+
+        logger.info(
+                "Total measurements stored: "
+                        + repository.getTotalCount()
+        );
+    }
+
+    private static void initializeDatabase() {
+
+        try (
+                Connection connection =
+                        DriverManager.getConnection(
+                                ApplicationConfig.getProperty(
+                                        "db.url"
+                                ),
+
+                                ApplicationConfig.getProperty(
+                                        "db.username"
+                                ),
+
+                                ApplicationConfig.getProperty(
+                                        "db.password"
+                                )
+                        );
+
+                Statement statement =
+                        connection.createStatement()
+        ) {
+
+            statement.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS quantity_measurements(
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        operation VARCHAR(100),
+                        result VARCHAR(255),
+                        error BOOLEAN,
+                        error_message VARCHAR(255)
+                    )
+                    """
+            );
+
+            logger.info(
+                    "Database initialized successfully"
+            );
+
+        } catch (Exception e) {
+
+            logger.severe(
+                    "Database initialization failed: "
+                            + e.getMessage()
+            );
+        }
     }
 }
