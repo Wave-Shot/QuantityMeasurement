@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+
+        - id: measurement-route
+
+          uri: lb://measurement-service
+
+          predicates:
+            - Path=/api/quantity/**
+
+        - id: user-route
+
+          uri: lb://user-service
+
+          predicates:
+            - Path=/api/users/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone:
+        http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
